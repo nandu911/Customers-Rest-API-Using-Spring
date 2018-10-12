@@ -1,4 +1,4 @@
-package com.luv2code.springdemo.rest;
+package com.springdemo.exceptionhandling;
 
 public class CustomerNotFoundException extends RuntimeException {
 
