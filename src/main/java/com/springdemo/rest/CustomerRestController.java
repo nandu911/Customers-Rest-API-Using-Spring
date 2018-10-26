@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.annotation.RequestScope;
 
 import com.springdemo.entity.Customer;
 import com.springdemo.exceptionhandling.*;
@@ -37,11 +38,10 @@ public class CustomerRestController {
 	
 	//add the mapping for GET/ customers by ID
 	@GetMapping("/customers/{customerId}")
-	public Customer getCustomers(@PathVariable int customerId	){
+	public Customer getCustomers(@PathVariable Integer customerId	){
 		
 		Customer theCustomer = customerService.getCustomer(customerId);
-		
-		if(theCustomer == null) {
+	 if(theCustomer == null) {
 			throw new CustomerNotFoundException("Customer id not found - "+ customerId);
 		}
 		
@@ -53,7 +53,10 @@ public class CustomerRestController {
 	public Customer addCustomer(@RequestBody Customer theCustomer) {
 		
 		List<Customer> customers = customerService.getCustomers();
-		if(customers.stream().anyMatch(c -> c.getEmail().equals(theCustomer.getEmail()))) {
+		if(theCustomer.getFirstName().isEmpty() || theCustomer.getEmail().isEmpty() || theCustomer.getLastName().isEmpty()) {
+			throw new NoInputException("Please give all input fields");
+		}
+		else if(customers.stream().anyMatch(c -> c.getEmail().equals(theCustomer.getEmail()))) {
 			throw new EmailAlreadyExistsException(theCustomer.getEmail()+ " already exists!");
 		}
 		
@@ -65,15 +68,26 @@ public class CustomerRestController {
 		return theCustomer;
 	}
 	
+	// adding search to search a customer by first name
 	@RequestMapping("/search/{customerName}")
 	public List<Customer> customerlist(@PathVariable String customerName) {
-		List<Customer> custList = customerService.getCustomers();
-		custList.sort(Comparator.comparing(Customer::getFirstName));
-		List<Customer> fileterdList = custList.stream().filter(c -> c.getFirstName().equalsIgnoreCase(customerName)).collect(Collectors.toList());
-		if(fileterdList.isEmpty()) {
-			throw new SearchNotFoundException(customerName+ " does not exist!");
-		}
-		return fileterdList;
+			List<Customer> custList = customerService.getCustomers();
+			custList.sort(Comparator.comparing(Customer::getFirstName));
+			// filtering customer by first name using streams and lambda expressions.
+			List<Customer> fileterdList = custList.stream().filter(c -> c.getFirstName().equalsIgnoreCase(customerName)).collect(Collectors.toList());
+		
+		  if(fileterdList.isEmpty()) {
+				throw new SearchNotFoundException(customerName+ " does not exist!");
+			} 
+			return fileterdList;
+
+	}
+	
+	// empty search request mapping
+	@RequestMapping("/search/")
+	public void searchEmpty () {
+		// throwing exception if input is not given for search function
+		throw new NoInputException("Please input first name of the customer to search");
 	}
 	
 }

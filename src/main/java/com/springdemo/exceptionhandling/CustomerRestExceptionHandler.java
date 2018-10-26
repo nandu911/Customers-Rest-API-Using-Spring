@@ -56,6 +56,15 @@ public class CustomerRestExceptionHandler {
 		
 	}
 	
+	@ExceptionHandler
+	public ResponseEntity<CustomerErrorResponse> handleException (NoInputException exc) {
+		
+		CustomerErrorResponse error = new CustomerErrorResponse(
+				HttpStatus.NOT_FOUND.value(), exc.getMessage(),System.currentTimeMillis());
+		
+		return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+		
+	}
 	//Add another exception handler for any other exception ( catch all )
 	@ExceptionHandler
 	public ResponseEntity<CustomerErrorResponse> handleException(Exception exc ){
@@ -72,4 +81,6 @@ public class CustomerRestExceptionHandler {
 		
 		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
 	}
+	
+	
 }
