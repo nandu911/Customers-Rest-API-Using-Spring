@@ -40,9 +40,9 @@ public class CustomerRestExceptionHandler {
 	public ResponseEntity<CustomerErrorResponse> handleException (EmailAlreadyExistsException exc) {
 		
 		CustomerErrorResponse error = new CustomerErrorResponse(
-				HttpStatus.BAD_REQUEST.value(), exc.getMessage(),System.currentTimeMillis());
+				HttpStatus.NOT_ACCEPTABLE.value(), exc.getMessage(),System.currentTimeMillis());
 		
-		return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(error, HttpStatus.NOT_ACCEPTABLE);
 		
 	}
 	
